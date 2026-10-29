@@ -93,4 +93,4 @@ This is a **community project**. We are not affiliated with SqueekChain. This is
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE) for details
