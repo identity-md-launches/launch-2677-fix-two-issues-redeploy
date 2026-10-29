@@ -94,6 +94,20 @@ import Layout from '../../layouts/Layout.astro';
   document.getElementById('mintBtn').addEventListener('click', async () => {
     const b = document.getElementById('blockNum').value;
     const s = document.getElementById('mintStatus');
+    const state = await core.state();
+    const h = Number(state[3]);
+
+    // Check before sending tx
+    if (Number(b) > h) {
+      s.textContent = `⚠ Block #${b} hasn't been mined yet. Current height: ${h.toLocaleString()}`;
+      s.classList.remove('hidden'); return;
+    }
+    const alreadyMinted = await nft.blockMinted(b);
+    if (alreadyMinted) {
+      s.textContent = `⚠ Block #${b} was already minted by someone else.`;
+      s.classList.remove('hidden'); return;
+    }
+
     s.textContent = 'Sending tx...'; s.classList.remove('hidden');
     try {
       const tx = await nft.mint(b);
@@ -102,7 +116,12 @@ import Layout from '../../layouts/Layout.astro';
       s.textContent = `✅ Block #${b} minted!`;
       await showToken(b);
       await refreshChain();
-    } catch (e) { s.textContent = `❌ ${e.reason || e.message}`; }
+    } catch (e) {
+      const msg = e.reason || e.message || 'Unknown error';
+      if (msg.includes('BlockNotYetMined') || msg.includes('0x03565efd')) s.textContent = `⚠ Block #${b} hasn't been mined yet.`;
+      else if (msg.includes('BlockAlreadyMinted') || msg.includes('0x08c379a0')) s.textContent = `⚠ Block #${b} was already minted.`;
+      else s.textContent = `❌ ${msg.slice(0,80)}`;
+    }
   });
 
   async function showToken(b) {
