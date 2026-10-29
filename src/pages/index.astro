@@ -1,0 +1,158 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+<main class="max-w-2xl mx-auto px-4 py-8">
+  <h1 class="text-amber text-lg font-bold mb-1">🐹 SqueekBlockNFT</h1>
+  <p class="text-muted text-xs mb-6">Mint block data cards on SqueekChain · Sepolia testnet</p>
+
+  <div class="term-box p-5 mb-6">
+    <div class="text-xs text-muted mb-3">Contract: <span class="text-green">0xC449...6095</span></div>
+
+    <!-- Wallet -->
+    <div class="mb-4">
+      <button id="connectBtn" class="term-btn" style="border-color:var(--color-amber);color:var(--color-amber)">
+        Connect Wallet
+      </button>
+      <span id="walletAddr" class="text-xs text-green ml-3 hidden"></span>
+    </div>
+
+    <!-- Mint -->
+    <div class="mb-4 hidden" id="mintSection">
+      <label class="text-xs text-muted block mb-2">Block number to mint (1-10000):</label>
+      <div class="flex gap-2">
+        <input type="number" id="blockNum" min="1" max="10000" value="1"
+          class="term-input flex-1" placeholder="1" />
+        <button id="mintBtn" class="term-btn" style="border-color:var(--color-green);color:var(--color-green)">
+          Mint
+        </button>
+      </div>
+      <div id="mintStatus" class="text-xs text-muted mt-2 hidden"></div>
+    </div>
+
+    <!-- Token URI -->
+    <div class="mb-4 hidden" id="tokenSection">
+      <div class="text-xs text-green mb-2">> Token URI</div>
+      <div id="tokenDisplay" class="term-box p-3 flex justify-center" style="min-height:200px">
+      </div>
+    </div>
+
+    <!-- All minted -->
+    <div class="hidden" id="allMinted">
+      <div class="text-xs text-green mb-2">> Minted Blocks</div>
+      <div id="mintedList" class="text-xs text-muted"></div>
+    </div>
+  </div>
+</main>
+</Layout>
+
+<script>
+  import { ethers } from 'https://esm.sh/ethers@6.13.5';
+
+  const CONTRACT = '0xC44930Ad4A7E9FA1dbCBA407399Da670FB266095';
+  const ABI = [
+    'function mint(uint256 b) external',
+    'function tokenURI(uint256 b) view returns (string)',
+    'function blockMinted(uint256) view returns (bool)',
+    'function totalMinted() view returns (uint256)',
+    'function MAX_SUPPLY() view returns (uint256)',
+  ];
+
+  let provider, signer, contract, account;
+
+  document.getElementById('connectBtn').addEventListener('click', async () => {
+    if (!window.ethereum) return alert('Install MetaMask');
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    provider = new ethers.BrowserProvider(window.ethereum);
+    signer = await provider.getSigner();
+    account = await signer.getAddress();
+    contract = new ethers.Contract(CONTRACT, ABI, signer);
+
+    document.getElementById('connectBtn').classList.add('hidden');
+    const addrEl = document.getElementById('walletAddr');
+    addrEl.textContent = `${account.slice(0,6)}...${account.slice(-4)}`;
+    addrEl.classList.remove('hidden');
+    document.getElementById('mintSection').classList.remove('hidden');
+    document.getElementById('allMinted').classList.remove('hidden');
+
+    await loadMinted();
+  });
+
+  document.getElementById('mintBtn').addEventListener('click', async () => {
+    const blockNum = document.getElementById('blockNum').value;
+    const status = document.getElementById('mintStatus');
+    status.textContent = 'Minting...';
+    status.classList.remove('hidden');
+
+    try {
+      const tx = await contract.mint(blockNum);
+      status.textContent = `Waiting for tx: ${tx.hash.slice(0,10)}...`;
+      await tx.wait();
+      status.textContent = `✅ Block #${blockNum} minted!`;
+      await showToken(blockNum);
+      await loadMinted();
+    } catch (e) {
+      status.textContent = `❌ ${e.reason || e.message}`;
+    }
+  });
+
+  async function showToken(blockNum) {
+    try {
+      const uri = await contract.tokenURI(blockNum);
+      const json = JSON.parse(atob(uri.replace('data:application/json;base64,','')));
+      const svgData = json.image;
+      document.getElementById('tokenSection').classList.remove('hidden');
+      document.getElementById('tokenDisplay').innerHTML = `<img src="${svgData}" style="width:300px;height:300px" alt="Block #${blockNum}" />`;
+    } catch (e) {
+      document.getElementById('tokenDisplay').textContent = 'Error loading token';
+    }
+  }
+
+  async function loadMinted() {
+    const total = Number(await contract.totalMinted());
+    const el = document.getElementById('mintedList');
+    if (total === 0) { el.textContent = 'No blocks minted yet'; return; }
+
+    const blocks = [];
+    for (let i = 1; i <= 100; i++) {
+      try {
+        if (await contract.blockMinted(i)) blocks.push(i);
+      } catch {}
+      if (blocks.length >= total) break;
+    }
+    el.innerHTML = blocks.map(b => `<span class="cursor-pointer text-green hover:underline" onclick="window.viewBlock(${b})">#${b}</span>`).join(' · ');
+  }
+
+  window.viewBlock = (b) => {
+    document.getElementById('blockNum').value = b;
+    showToken(b);
+  };
+</script>
+
+<style>
+  .term-box {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+  .term-btn {
+    background: transparent;
+    border: 1px solid;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .term-btn:hover { opacity: 0.8; }
+  .term-input {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+</style>
