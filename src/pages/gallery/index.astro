@@ -29,7 +29,12 @@ import Layout from '../../layouts/Layout.astro';
     const total = Number(await nft.totalMinted());
     
     const blocks = [];
-    for (let i = Math.max(1, h - 200); i <= h && blocks.length < total; i++) {
+    // Scan from block 1 upward until we find all minted blocks (max scan 500)
+    for (let i = 1; i <= Math.min(h, 500) && blocks.length < total; i++) {
+      try { if (await nft.blockMinted(i)) blocks.push(i); } catch {}
+    }
+    // If still not found all, continue scanning
+    for (let i = 501; i <= h && blocks.length < total; i += 10) {
       try { if (await nft.blockMinted(i)) blocks.push(i); } catch {}
     }
     
