@@ -15,7 +15,7 @@ import Layout from '../../layouts/Layout.astro';
 
 <script>
   import { ethers } from 'https://esm.sh/ethers@6.13.5';
-  const CONTRACT = '0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64';
+  const CONTRACT = '0x531497ddc70d634342020b1111C8b1A92873e669';
   const CORE = '0x74665dAecA35A2303e767E76a2FF1FB6F93e119f';
   const ABI = ['function blockMinted(uint256) view returns (bool)','function totalMinted() view returns (uint256)','function tokenURI(uint256) view returns (string)'];
   const CORE_ABI = ['function state() view returns (uint64,uint64,uint96,uint64,uint96,uint32,uint256,bool)'];

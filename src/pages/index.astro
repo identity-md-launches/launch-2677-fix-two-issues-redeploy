@@ -10,7 +10,7 @@ import Layout from '../layouts/Layout.astro';
     <h1 class="text-amber text-2xl font-bold mb-3">🐹 SqueekBlockNFT</h1>
     <p class="text-xs mb-3" style="color:#f5a623;background:#1a1a0a;padding:6px 12px;border-radius:6px;border:1px solid #f5a62333;display:inline-block">🐹 v1 — block data cards. NFT art will be upgraded in future versions.</p>
     <p class="text-muted text-sm max-w-lg mx-auto">
-      Mint block data cards on SqueekChain. Each NFT records the state of one block — round, work, difficulty, and rarity. Built on Sepolia testnet.
+      Mint block data cards on SqueekChain. Each NFT records the state of one block — round, work, and rarity. Built on Sepolia testnet.
     </p>
     <div class="mt-6 flex justify-center gap-3">
       <a href="/mint" class="term-btn" style="border-color:var(--color-amber);color:var(--color-amber);text-decoration:none;padding:8px 24px;font-size:14px">
@@ -47,7 +47,7 @@ import Layout from '../layouts/Layout.astro';
       </div>
       <div class="term-box p-4">
         <div class="text-amber font-bold mb-2">03. Mint & View</div>
-        <p class="text-muted">Mint your block data card. View it anytime in the gallery — each card shows round, work, difficulty, and rarity.</p>
+        <div class="text-muted">Mint your block data card. View it anytime in the gallery — each card shows round, work, and rarity.</div>
       </div>
     </div>
   </div>
@@ -55,7 +55,7 @@ import Layout from '../layouts/Layout.astro';
   <!-- Contract info -->
   <div class="term-box p-5 text-xs">
     <div class="flex flex-col md:flex-row md:justify-between gap-2">
-      <span class="text-muted">Contract: <a href="https://sepolia.etherscan.io/address/0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64" class="text-green hover:underline" target="_blank">0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64</a></span>
+      <span class="text-muted">Contract: <a href="https://sepolia.etherscan.io/address/0x531497ddc70d634342020b1111C8b1A92873e669" class="text-green hover:underline" target="_blank">0x531497ddc70d634342020b1111C8b1A92873e669</a></span>
       <span class="text-muted"><span class="text-green">✓</span> Verified on Sepolia testnet</span>
     </div>
   </div>
@@ -72,7 +72,7 @@ import Layout from '../layouts/Layout.astro';
     try {
       const p = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
       const core = new ethers.Contract(CORE, CORE_ABI, p);
-      const nft = new ethers.Contract('0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64', CONTRACT_ABI, p);
+      const nft = new ethers.Contract('0x531497ddc70d634342020b1111C8b1A92873e669', CONTRACT_ABI, p);
       const [state, minted] = await Promise.all([core.state(), nft.totalMinted()]);
       document.getElementById('statHeight').textContent = Number(state[3]).toLocaleString();
       document.getElementById('statMinted').textContent = Number(minted).toLocaleString();
