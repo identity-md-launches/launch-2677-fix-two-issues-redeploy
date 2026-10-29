@@ -33,6 +33,13 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </div>
 
+  <!-- Sample Cards -->
+  <div class="mb-8">
+    <h2 class="text-xs text-green mb-3">> Sample Cards</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="sampleCards">
+    </div>
+  </div>
+
   <!-- How it works -->
   <div class="mb-8">
     <h2 class="text-xs text-green mb-3">> How It Works</h2>
@@ -80,6 +87,47 @@ import Layout from '../layouts/Layout.astro';
     } catch {}
   }
   loadStats();
+  renderSamples();
+
+  function rarity(b) {
+    if (b <= 10) return "Legendary";
+    if (b <= 100) return "Epic";
+    if (b <= 1000) return "Rare";
+    return "Common";
+  }
+
+  function row(label, y, value, color) {
+    return `<text x="80" y="${y}" fill="#888" font-size="13" font-family="monospace">${label}</text><text x="320" y="${y}" text-anchor="end" fill="${color}" font-size="15" font-family="monospace" font-weight="bold">${value}</text>`;
+  }
+
+  function renderSamples() {
+    const samples = [
+      { b: 1, r: 1, w: 11 },
+      { b: 100, r: 3, w: 1086 },
+      { b: 1000, r: 141, w: 10941 },
+      { b: 6969, r: 894, w: 79134 },
+    ];
+    const grid = document.getElementById('sampleCards');
+    grid.innerHTML = samples.map(s => {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" shape-rendering="crispEdges">
+<rect width="400" height="300" fill="#0a0a14"/>
+<text x="200" y="38" text-anchor="middle" fill="#f5a623" font-size="16" font-family="monospace" font-weight="bold">🐹 SQUEKKCHAIN</text>
+<line x1="40" y1="48" x2="360" y2="48" stroke="#f5a623" stroke-width="1" opacity="0.3"/>
+<text x="200" y="105" text-anchor="middle" fill="#ffffff" font-size="64" font-family="monospace" font-weight="bold">#${s.b}</text>
+<text x="200" y="135" text-anchor="middle" fill="#888" font-size="13" font-family="monospace">Block ${s.b}</text>
+<rect x="145" y="150" width="110" height="26" rx="13" fill="#16c79a" opacity="0.15"/>
+<text x="200" y="168" text-anchor="middle" fill="#16c79a" font-size="13" font-family="monospace" font-weight="bold">✓ SETTLED</text>
+<rect x="60" y="185" width="280" height="95" rx="10" fill="#111122" stroke="#222244" stroke-width="1"/>
+${row("Round", 210, String(s.r), "#c0c0f0")}
+${row("Work", 238, String(s.w), "#c0c0f0")}
+${row("Rarity", 266, rarity(s.b), "#e94560")}
+</svg>`;
+      return `<div class="term-box p-2 text-center hover:opacity-80" style="cursor:pointer" onclick="location.href='/mint'">
+        <img src="data:image/svg+xml;base64,${btoa(svg)}" style="width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:4px" />
+        <div class="text-xs mt-1"><span class="text-text">#${s.b}</span> <span class="text-muted">· ${rarity(s.b)}</span></div>
+      </div>`;
+    }).join('');
+  }
 </script>
 
 <style>
