@@ -122,8 +122,9 @@ ${row("Round", 210, String(s.r), "#c0c0f0")}
 ${row("Work", 238, String(s.w), "#c0c0f0")}
 ${row("Rarity", 266, rarity(s.b), "#e94560")}
 </svg>`;
+      const svgBase64 = btoa(unescape(encodeURIComponent(svg)));
       return `<div class="term-box p-2 text-center hover:opacity-80" style="cursor:pointer" onclick="location.href='/mint'">
-        <img src="data:image/svg+xml;base64,${btoa(svg)}" style="width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:4px" />
+        <img src="data:image/svg+xml;base64,${svgBase64}" style="width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:4px" />
         <div class="text-xs mt-1"><span class="text-text">#${s.b}</span> <span class="text-muted">· ${rarity(s.b)}</span></div>
       </div>`;
     }).join('');
