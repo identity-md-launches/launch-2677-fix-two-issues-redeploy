@@ -63,6 +63,28 @@ import Layout from '../layouts/Layout.astro';
 
   document.getElementById('connectBtn').addEventListener('click', async () => {
     if (!window.ethereum) return alert('Install MetaMask');
+    
+    // Switch to Sepolia
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0xaa36a7' }], // Sepolia chainId 11155111
+      });
+    } catch (e) {
+      if (e.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0xaa36a7',
+            chainName: 'Sepolia Testnet',
+            rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'],
+            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+            blockExplorerUrls: ['https://sepolia.etherscan.io'],
+          }],
+        });
+      }
+    }
+
     await window.ethereum.request({ method: 'eth_requestAccounts' });
     provider = new ethers.BrowserProvider(window.ethereum);
     signer = await provider.getSigner();
