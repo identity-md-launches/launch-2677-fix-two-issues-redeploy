@@ -1,0 +1,61 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Gallery — SqueekBlockNFT" current="/gallery">
+<div class="max-w-4xl mx-auto px-4 py-12">
+  <h1 class="text-amber text-lg font-bold mb-1">> Gallery</h1>
+  <p class="text-muted text-xs mb-6">All minted block data cards. Click any card to view full size.</p>
+
+  <div id="galleryGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="text-muted text-xs col-span-full text-center py-8">Loading...</div>
+  </div>
+</div>
+</Layout>
+
+<script>
+  import { ethers } from 'https://esm.sh/ethers@6.13.5';
+  const CONTRACT = '0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64';
+  const CORE = '0x74665dAecA35A2303e767E76a2FF1FB6F93e119f';
+  const ABI = ['function blockMinted(uint256) view returns (bool)','function totalMinted() view returns (uint256)','function tokenURI(uint256) view returns (string)'];
+  const CORE_ABI = ['function state() view returns (uint64,uint64,uint96,uint64,uint96,uint32,uint256,bool)'];
+
+  async function load() {
+    const p = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
+    const nft = new ethers.Contract(CONTRACT, ABI, p);
+    const core = new ethers.Contract(CORE, CORE_ABI, p);
+    const state = await core.state();
+    const h = Number(state[3]);
+    const total = Number(await nft.totalMinted());
+    
+    const blocks = [];
+    for (let i = Math.max(1, h - 200); i <= h && blocks.length < total; i++) {
+      try { if (await nft.blockMinted(i)) blocks.push(i); } catch {}
+    }
+    
+    const grid = document.getElementById('galleryGrid');
+    if (blocks.length === 0) { grid.innerHTML = '<div class="text-muted text-xs col-span-full text-center py-8">No blocks minted yet — <a href="/mint" class="text-green hover:underline">mint one</a></div>'; return; }
+
+    const cards = await Promise.all(blocks.slice(0, 40).map(async b => {
+      try {
+        const uri = await nft.tokenURI(b);
+        const json = JSON.parse(atob(uri.replace('data:application/json;base64,','')));
+        const attrs = json.attributes || [];
+        const rarity = attrs.find(a => a.trait_type === 'Rarity')?.value || '?';
+        return { b, img: json.image, rarity };
+      } catch { return null; }
+    }));
+
+    grid.innerHTML = cards.filter(Boolean).map(c => `
+      <a href="/mint" class="term-box p-2 text-center no-underline hover:opacity-80" onclick="sessionStorage.setItem('viewBlock','${c.b}')">
+        <img src="${c.img}" style="width:100%;aspect-ratio:1;object-fit:contain;border-radius:4px" />
+        <div class="text-xs mt-1"><span class="text-text">#${c.b}</span> <span class="text-muted">· ${c.rarity}</span></div>
+      </a>
+    `).join('');
+  }
+  load();
+</script>
+
+<style>
+  .term-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
+</style>

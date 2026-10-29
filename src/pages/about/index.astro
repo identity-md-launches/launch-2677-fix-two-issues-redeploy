@@ -1,0 +1,54 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="About — SqueekBlockNFT" current="/about">
+<div class="max-w-2xl mx-auto px-4 py-12">
+  <h1 class="text-amber text-lg font-bold mb-1">> About</h1>
+  <p class="text-muted text-xs mb-8">SqueekBlockNFT is the official NFT collection for SqueekChain.</p>
+
+  <div class="space-y-6 text-xs">
+    <div class="term-box p-5">
+      <h2 class="text-green font-bold mb-2">What is SqueekChain?</h2>
+      <p class="text-muted">SqueekChain is a hamster-powered proof-of-work toychain on Ethereum Sepolia testnet. A hamster named Squeektoshi runs on the WHEELY9000 wheel. Each magnet passage is one work unit, settled to Ethereum as Squeek blocks, issuing SQK tokens.</p>
+    </div>
+
+    <div class="term-box p-5">
+      <h2 class="text-green font-bold mb-2">What is a Block Data Card?</h2>
+      <p class="text-muted">Each SqueekBlockNFT represents one block on SqueekChain. The card displays on-chain data: block number, round, work units, difficulty tier, completion percentage, and rarity. It's a verifiable record of the hamster's work.</p>
+    </div>
+
+    <div class="term-box p-5">
+      <h2 class="text-green font-bold mb-2">Rarity Tiers</h2>
+      <div class="space-y-2 text-muted">
+        <div><span class="text-amber font-bold">Legendary</span> — Blocks #1-#10</div>
+        <div><span class="text-text font-bold" style="color:#a855f7">Epic</span> — Blocks #11-#100</div>
+        <div><span class="text-text font-bold" style="color:#4a90d9">Rare</span> — Blocks #101-#1,000</div>
+        <div><span class="text-green font-bold">Milestone</span> — Every 1,000th block</div>
+        <div><span class="text-green font-bold">Notable</span> — Every 100th block</div>
+        <div><span class="text-muted">Common</span> — Everything else</div>
+      </div>
+    </div>
+
+    <div class="term-box p-5">
+      <h2 class="text-green font-bold mb-2">How to Mint</h2>
+      <ol class="text-muted space-y-1 pl-4 list-decimal">
+        <li>Connect your wallet — site auto-switches to Sepolia testnet</li>
+        <li>Get Sepolia ETH from a faucet (alchemy.com/faucets, sepoliafaucet.com)</li>
+        <li>Pick any block #1-#10,000 that has been mined</li>
+        <li>Click Mint — your NFT appears instantly</li>
+      </ol>
+    </div>
+
+    <div class="term-box p-5">
+      <h2 class="text-green font-bold mb-2">Contract</h2>
+      <p class="text-muted">Deployed on Sepolia testnet. All art is generated fully on-chain via SVG. No IPFS, no external dependencies.</p>
+      <p class="mt-2"><a href="https://sepolia.etherscan.io/address/0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64" class="text-green hover:underline">0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64</a></p>
+    </div>
+  </div>
+</div>
+</Layout>
+
+<style>
+  .term-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
+</style>

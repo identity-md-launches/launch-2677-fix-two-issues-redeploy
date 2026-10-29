@@ -1,180 +1,88 @@
 ---
 import Layout from '../layouts/Layout.astro';
+const CONTRACT = '0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64';
 ---
 
-<Layout>
-<main class="max-w-2xl mx-auto px-4 py-8">
-  <h1 class="text-amber text-lg font-bold mb-1">🐹 SqueekBlockNFT</h1>
-  <p class="text-muted text-xs mb-6">Mint block data cards on SqueekChain · Sepolia testnet</p>
-
-  <div class="term-box p-5 mb-6">
-    <div class="text-xs text-muted mb-3">Contract: <span class="text-green">0xF214...Ed64</span></div>
-
-    <!-- Wallet -->
-    <div class="mb-4">
-      <button id="connectBtn" class="term-btn" style="border-color:var(--color-amber);color:var(--color-amber)">
-        Connect Wallet
-      </button>
-      <span id="walletAddr" class="text-xs text-green ml-3 hidden"></span>
-    </div>
-
-    <!-- Mint -->
-    <div class="mb-4 hidden" id="mintSection">
-      <label class="text-xs text-muted block mb-2">Block number to mint (1-10000):</label>
-      <div class="flex gap-2">
-        <input type="number" id="blockNum" min="1" max="10000" value="1"
-          class="term-input flex-1" placeholder="1" />
-        <button id="mintBtn" class="term-btn" style="border-color:var(--color-green);color:var(--color-green)">
-          Mint
-        </button>
-      </div>
-      <div id="mintStatus" class="text-xs text-muted mt-2 hidden"></div>
-    </div>
-
-    <!-- Token URI -->
-    <div class="mb-4 hidden" id="tokenSection">
-      <div class="text-xs text-green mb-2">> Token URI</div>
-      <div id="tokenDisplay" class="term-box p-3 flex justify-center" style="min-height:200px">
-      </div>
-    </div>
-
-    <!-- All minted -->
-    <div class="hidden" id="allMinted">
-      <div class="text-xs text-green mb-2">> Minted Blocks</div>
-      <div id="mintedList" class="text-xs text-muted"></div>
+<Layout title="SqueekBlockNFT — Mint Block Data Cards" current="/">
+<div class="max-w-3xl mx-auto px-4 py-16">
+  
+  <!-- Hero -->
+  <div class="text-center mb-12">
+    <h1 class="text-amber text-2xl font-bold mb-3">🐹 SqueekBlockNFT</h1>
+    <p class="text-muted text-sm max-w-lg mx-auto">
+      Mint block data cards on SqueekChain. Each NFT records the state of one block — round, work, difficulty, and rarity. Built on Sepolia testnet.
+    </p>
+    <div class="mt-6 flex justify-center gap-3">
+      <a href="/mint" class="term-btn" style="border-color:var(--color-amber);color:var(--color-amber);text-decoration:none;padding:8px 24px;font-size:14px">
+        Mint a Block
+      </a>
+      <a href="/gallery" class="term-btn" style="border-color:var(--color-green);color:var(--color-green);text-decoration:none;padding:8px 24px;font-size:14px">
+        View Gallery
+      </a>
     </div>
   </div>
-</main>
+
+  <!-- Chain Stats -->
+  <div class="term-box p-5 mb-8">
+    <h2 class="text-xs text-green mb-3">> Chain Stats</h2>
+    <div id="chainStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+      <div class="text-center p-3 term-box"><div class="text-muted mb-1">Block Height</div><div class="text-text font-bold text-lg" id="statHeight">--</div></div>
+      <div class="text-center p-3 term-box"><div class="text-muted mb-1">Total Minted</div><div class="text-green font-bold text-lg" id="statMinted">--</div></div>
+      <div class="text-center p-3 term-box"><div class="text-muted mb-1">Max Supply</div><div class="text-text font-bold text-lg">10,000</div></div>
+      <div class="text-center p-3 term-box"><div class="text-muted mb-1">Network</div><div class="text-amber font-bold text-lg">Sepolia</div></div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="mb-8">
+    <h2 class="text-xs text-green mb-3">> How It Works</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+      <div class="term-box p-4">
+        <div class="text-amber font-bold mb-2">01. Connect</div>
+        <p class="text-muted">Connect your wallet to Sepolia testnet. The site auto-switches to the right network.</p>
+      </div>
+      <div class="term-box p-4">
+        <div class="text-amber font-bold mb-2">02. Pick a Block</div>
+        <p class="text-muted">Choose any block from #1 to #10,000. Only mined blocks are mintable — pending blocks become available as the hamster runs.</p>
+      </div>
+      <div class="term-box p-4">
+        <div class="text-amber font-bold mb-2">03. Mint & View</div>
+        <p class="text-muted">Mint your block data card. View it anytime in the gallery — each card shows round, work, difficulty, and rarity.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contract info -->
+  <div class="term-box p-5 text-xs">
+    <div class="flex flex-col md:flex-row md:justify-between gap-2">
+      <span class="text-muted">Contract: <a href="https://sepolia.etherscan.io/address/{CONTRACT}" class="text-green hover:underline">{CONTRACT.slice(0,10)}...{CONTRACT.slice(-4)}</a></span>
+      <span class="text-muted"><span class="text-green">✓</span> Verified on Sepolia · SqueekChain Core: 0x7466...</span>
+    </div>
+  </div>
+</div>
 </Layout>
 
 <script>
   import { ethers } from 'https://esm.sh/ethers@6.13.5';
+  const CORE = '0x74665dAecA35A2303e767E76a2FF1FB6F93e119f';
+  const CONTRACT_ABI = ['function totalMinted() view returns (uint256)'];
+  const CORE_ABI = ['function state() view returns (uint64,uint64,uint96,uint64,uint96,uint32,uint256,bool)'];
 
-  const CONTRACT = '0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64';
-  const ABI = [
-    'function mint(uint256 b) external',
-    'function tokenURI(uint256 b) view returns (string)',
-    'function blockMinted(uint256) view returns (bool)',
-    'function totalMinted() view returns (uint256)',
-    'function MAX_SUPPLY() view returns (uint256)',
-  ];
-
-  let provider, signer, contract, account;
-
-  document.getElementById('connectBtn').addEventListener('click', async () => {
-    if (!window.ethereum) return alert('Install MetaMask');
-    
-    // Switch to Sepolia
+  async function loadStats() {
     try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0xaa36a7' }], // Sepolia chainId 11155111
-      });
-    } catch (e) {
-      if (e.code === 4902) {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: '0xaa36a7',
-            chainName: 'Sepolia Testnet',
-            rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'],
-            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-            blockExplorerUrls: ['https://sepolia.etherscan.io'],
-          }],
-        });
-      }
-    }
-
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
-    provider = new ethers.BrowserProvider(window.ethereum);
-    signer = await provider.getSigner();
-    account = await signer.getAddress();
-    contract = new ethers.Contract(CONTRACT, ABI, signer);
-
-    document.getElementById('connectBtn').classList.add('hidden');
-    const addrEl = document.getElementById('walletAddr');
-    addrEl.textContent = `${account.slice(0,6)}...${account.slice(-4)}`;
-    addrEl.classList.remove('hidden');
-    document.getElementById('mintSection').classList.remove('hidden');
-    document.getElementById('allMinted').classList.remove('hidden');
-
-    await loadMinted();
-  });
-
-  document.getElementById('mintBtn').addEventListener('click', async () => {
-    const blockNum = document.getElementById('blockNum').value;
-    const status = document.getElementById('mintStatus');
-    status.textContent = 'Minting...';
-    status.classList.remove('hidden');
-
-    try {
-      const tx = await contract.mint(blockNum);
-      status.textContent = `Waiting for tx: ${tx.hash.slice(0,10)}...`;
-      await tx.wait();
-      status.textContent = `✅ Block #${blockNum} minted!`;
-      await showToken(blockNum);
-      await loadMinted();
-    } catch (e) {
-      status.textContent = `❌ ${e.reason || e.message}`;
-    }
-  });
-
-  async function showToken(blockNum) {
-    try {
-      const uri = await contract.tokenURI(blockNum);
-      const json = JSON.parse(atob(uri.replace('data:application/json;base64,','')));
-      const svgData = json.image;
-      document.getElementById('tokenSection').classList.remove('hidden');
-      document.getElementById('tokenDisplay').innerHTML = `<img src="${svgData}" style="width:300px;height:300px" alt="Block #${blockNum}" />`;
-    } catch (e) {
-      document.getElementById('tokenDisplay').textContent = 'Error loading token';
-    }
+      const p = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
+      const core = new ethers.Contract(CORE, CORE_ABI, p);
+      const nft = new ethers.Contract('0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64', CONTRACT_ABI, p);
+      const [state, minted] = await Promise.all([core.state(), nft.totalMinted()]);
+      document.getElementById('statHeight').textContent = Number(state[3]).toLocaleString();
+      document.getElementById('statMinted').textContent = Number(minted).toLocaleString();
+    } catch {}
   }
-
-  async function loadMinted() {
-    const total = Number(await contract.totalMinted());
-    const el = document.getElementById('mintedList');
-    if (total === 0) { el.textContent = 'No blocks minted yet'; return; }
-
-    const blocks = [];
-    for (let i = 1; i <= 100; i++) {
-      try {
-        if (await contract.blockMinted(i)) blocks.push(i);
-      } catch {}
-      if (blocks.length >= total) break;
-    }
-    el.innerHTML = blocks.map(b => `<span class="cursor-pointer text-green hover:underline" onclick="window.viewBlock(${b})">#${b}</span>`).join(' · ');
-  }
-
-  window.viewBlock = (b) => {
-    document.getElementById('blockNum').value = b;
-    showToken(b);
-  };
+  loadStats();
 </script>
 
 <style>
-  .term-box {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-  }
-  .term-btn {
-    background: transparent;
-    border: 1px solid;
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    cursor: pointer;
-  }
+  .term-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
+  .term-btn { background: transparent; border: 1px solid; border-radius: 6px; font-family: var(--font-mono); cursor: pointer; display: inline-block; }
   .term-btn:hover { opacity: 0.8; }
-  .term-input {
-    background: var(--color-bg);
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
 </style>

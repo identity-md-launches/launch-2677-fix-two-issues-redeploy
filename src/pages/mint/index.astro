@@ -1,0 +1,134 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Mint — SqueekBlockNFT" current="/mint">
+<div class="max-w-2xl mx-auto px-4 py-12">
+  <h1 class="text-amber text-lg font-bold mb-1">> Mint a Block</h1>
+  <p class="text-muted text-xs mb-6">Connect your wallet, pick a block, mint your NFT.</p>
+
+  <div class="term-box p-5 mb-6">
+    <!-- Wallet -->
+    <div class="mb-4">
+      <button id="connectBtn" class="term-btn" style="border-color:var(--color-amber);color:var(--color-amber)">
+        Connect Wallet
+      </button>
+      <span id="walletAddr" class="text-xs text-green ml-3 hidden"></span>
+      <span id="chainWarning" class="text-xs text-red ml-3 hidden">⚠ Wrong network — switch to Sepolia</span>
+    </div>
+
+    <!-- Block picker + status -->
+    <div class="mb-4 hidden" id="mintSection">
+      <div class="text-xs text-green mb-2">> On-Chain Data</div>
+      <div class="grid grid-cols-2 gap-3 text-xs mb-4">
+        <div class="term-box p-3"><span class="text-muted">Block Height</span> <span id="chainHeight" class="text-text float-right">--</span></div>
+        <div class="term-box p-3"><span class="text-muted">Total Minted</span> <span id="chainMinted" class="text-green float-right">--</span></div>
+      </div>
+
+      <label class="text-xs text-muted block mb-2">Block number (1-10,000):</label>
+      <div class="flex gap-2 mb-3">
+        <input type="number" id="blockNum" min="1" max="10000" value="1" class="term-input flex-1" />
+        <button id="mintBtn" class="term-btn" style="border-color:var(--color-green);color:var(--color-green)">Mint</button>
+      </div>
+      <div id="mintStatus" class="text-xs text-muted hidden"></div>
+    </div>
+
+    <!-- Token display -->
+    <div class="hidden" id="tokenSection">
+      <div class="text-xs text-green mb-2">> Token Preview</div>
+      <div id="tokenDisplay" class="flex justify-center"></div>
+    </div>
+  </div>
+
+  <!-- Recently minted -->
+  <div class="hidden" id="recentSection">
+    <h2 class="text-xs text-green mb-3">> Recently Minted</h2>
+    <div id="recentList" class="flex flex-wrap gap-2 text-xs"></div>
+  </div>
+</div>
+</Layout>
+
+<script>
+  import { ethers } from 'https://esm.sh/ethers@6.13.5';
+
+  const CONTRACT = '0xF2147D4F3d5DdD5990233b82b0D6b5077d06Ed64';
+  const CORE = '0x74665dAecA35A2303e767E76a2FF1FB6F93e119f';
+  const NFT_ABI = ['function mint(uint256 b) external','function tokenURI(uint256 b) view returns (string)','function blockMinted(uint256) view returns (bool)','function totalMinted() view returns (uint256)'];
+  const CORE_ABI = ['function state() view returns (uint64,uint64,uint96,uint64,uint96,uint32,uint256,bool)','function blockInfo(uint64) view returns (uint64,uint64)'];
+
+  let provider, signer, nft, core, account;
+
+  document.getElementById('connectBtn').addEventListener('click', async () => {
+    if (!window.ethereum) return alert('Install MetaMask');
+    try {
+      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0xaa36a7' }] });
+    } catch (e) {
+      if (e.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0xaa36a7', chainName: 'Sepolia Testnet', rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'], nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, blockExplorerUrls: ['https://sepolia.etherscan.io'] }] });
+    }
+    await window.ethereum.request({ method: 'eth_requestAccounts' });
+    provider = new ethers.BrowserProvider(window.ethereum);
+    signer = await provider.getSigner();
+    account = await signer.getAddress();
+    nft = new ethers.Contract(CONTRACT, NFT_ABI, signer);
+    core = new ethers.Contract(CORE, CORE_ABI, provider);
+
+    document.getElementById('connectBtn').classList.add('hidden');
+    const addr = document.getElementById('walletAddr');
+    addr.textContent = `${account.slice(0,6)}...${account.slice(-4)}`;
+    addr.classList.remove('hidden');
+    document.getElementById('mintSection').classList.remove('hidden');
+    document.getElementById('recentSection').classList.remove('hidden');
+    await refreshChain();
+  });
+
+  async function refreshChain() {
+    const state = await core.state();
+    const h = Number(state[3]); const minted = Number(await nft.totalMinted());
+    document.getElementById('chainHeight').textContent = h.toLocaleString();
+    document.getElementById('chainMinted').textContent = minted.toLocaleString();
+    document.getElementById('blockNum').max = h;
+    if (Number(document.getElementById('blockNum').value) > h) document.getElementById('blockNum').value = h;
+    await loadRecent(h);
+  }
+
+  document.getElementById('mintBtn').addEventListener('click', async () => {
+    const b = document.getElementById('blockNum').value;
+    const s = document.getElementById('mintStatus');
+    s.textContent = 'Sending tx...'; s.classList.remove('hidden');
+    try {
+      const tx = await nft.mint(b);
+      s.textContent = `Confirming ${tx.hash.slice(0,10)}...`;
+      await tx.wait();
+      s.textContent = `✅ Block #${b} minted!`;
+      await showToken(b);
+      await refreshChain();
+    } catch (e) { s.textContent = `❌ ${e.reason || e.message}`; }
+  });
+
+  async function showToken(b) {
+    try {
+      const uri = await nft.tokenURI(b);
+      const json = JSON.parse(atob(uri.replace('data:application/json;base64,','')));
+      document.getElementById('tokenSection').classList.remove('hidden');
+      document.getElementById('tokenDisplay').innerHTML = `<img src="${json.image}" style="width:320px;height:320px;border-radius:8px" />`;
+    } catch {}
+  }
+
+  async function loadRecent(h) {
+    const el = document.getElementById('recentList');
+    const minted = [];
+    for (let i = Math.max(1, h - 30); i <= h && minted.length < 12; i++) {
+      try { if (await nft.blockMinted(i)) minted.push(i); } catch {}
+    }
+    el.innerHTML = minted.map(b => `<a href="#" class="term-btn text-green" style="text-decoration:none;font-size:11px;padding:4px 10px" onclick="document.getElementById('blockNum').value=${b};return false">#${b}</a>`).join(' ');
+    if (minted.length === 0) el.textContent = 'No blocks minted yet';
+  }
+</script>
+
+<style>
+  .term-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
+  .term-btn { background: transparent; border: 1px solid; padding: 6px 16px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; cursor: pointer; }
+  .term-btn:hover { opacity: 0.8; }
+  .term-input { background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); padding: 6px 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; }
+  .float-right { float: right; }
+</style>
