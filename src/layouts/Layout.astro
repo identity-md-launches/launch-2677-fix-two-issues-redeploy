@@ -5,10 +5,11 @@ import Footer from '../components/Footer.astro';
 
 interface Props {
   title?: string;
+  description?: string;
   current?: string;
 }
 
-const { title, current } = Astro.props;
+const { title, description, current } = Astro.props;
 ---
 
 <!doctype html>
@@ -17,6 +18,7 @@ const { title, current } = Astro.props;
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title || 'SqueekBlockNFT'}</title>
+  <meta name="description" content={description || 'Mint block data cards on SqueekChain. Each NFT records round, work, and rarity — fully on-chain SVG art. Sepolia testnet.'} />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
