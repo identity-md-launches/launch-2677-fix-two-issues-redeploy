@@ -9,10 +9,10 @@ const links = [
 ---
 <header class="border-b border-border">
   <nav class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-    <a href="/" class="text-amber font-bold text-sm no-underline">🐹 SqueekBlockNFT <span class="text-muted text-xs">v1</span></a>
-    <div class="flex gap-4 text-xs">
+    <a href="./index.html" class="brand text-amber font-bold text-sm no-underline"><span aria-hidden="true">🐹</span> SqueekBlockNFT <span class="text-muted text-sm">v1</span></a>
+    <div class="nav-links flex text-sm">
       {links.map(({ href, label }) => (
-        <a href={href} class={`no-underline ${current === href ? 'text-green' : 'text-muted hover:text-green'}`}>
+        <a href={href === '/' ? './index.html' : `.${href}.html`} aria-current={current === href ? 'page' : undefined} class={`no-underline ${current === href ? 'text-green' : 'text-muted hover:text-green'}`}>
           {label}
         </a>
       ))}

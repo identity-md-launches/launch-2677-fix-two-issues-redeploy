@@ -1,0 +1,25 @@
+---
+interface Props { block: number; round: number; work: number; }
+const { block, round, work } = Astro.props;
+const rarity = block <= 10 ? 'Legendary' : block <= 100 ? 'Epic' : block <= 1000 ? 'Rare' : block % 1000 === 0 ? 'Milestone' : block % 100 === 0 ? 'Notable' : 'Common';
+const color = rarity === 'Legendary' ? '#f5a623' : rarity === 'Epic' ? '#bd8cfa' : rarity === 'Rare' ? '#70ace9' : rarity === 'Common' ? '#9999aa' : '#16c79a';
+---
+<a href={`./mint.html?block=${block}`} class="term-box sample-card no-underline" aria-label={`View sample block ${block}, ${rarity}`}>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" shape-rendering="crispEdges" role="img" aria-label={`Example block ${block}, round ${round}, work ${work}, ${rarity}`}>
+    <rect width="400" height="300" fill="#0a0a14" />
+    <text x="200" y="38" text-anchor="middle" fill="#f5a623" font-size="16" font-family="monospace" font-weight="bold">🐹 SQUEKKCHAIN</text>
+    <line x1="40" y1="48" x2="360" y2="48" stroke="#f5a623" stroke-width="1" opacity="0.3" />
+    <text x="200" y="105" text-anchor="middle" fill="#ffffff" font-size="64" font-family="monospace" font-weight="bold">#{block}</text>
+    <text x="200" y="135" text-anchor="middle" fill="#888" font-size="13" font-family="monospace">Block {block}</text>
+    <rect x="145" y="150" width="110" height="26" rx="13" fill="#16c79a" opacity="0.15" />
+    <text x="200" y="168" text-anchor="middle" fill="#16c79a" font-size="13" font-family="monospace" font-weight="bold">✓ SETTLED</text>
+    <rect x="60" y="185" width="280" height="95" rx="10" fill="#111122" stroke="#222244" stroke-width="1" />
+    <text x="80" y="210" fill="#888" font-size="13" font-family="monospace">Round</text>
+    <text x="320" y="210" text-anchor="end" fill="#c0c0f0" font-size="15" font-family="monospace" font-weight="bold">{round}</text>
+    <text x="80" y="238" fill="#888" font-size="13" font-family="monospace">Work</text>
+    <text x="320" y="238" text-anchor="end" fill="#c0c0f0" font-size="15" font-family="monospace" font-weight="bold">{work}</text>
+    <text x="80" y="266" fill="#888" font-size="13" font-family="monospace">Rarity</text>
+    <text x="320" y="266" text-anchor="end" fill="#e94560" font-size="15" font-family="monospace" font-weight="bold">{rarity}</text>
+  </svg>
+  <span class="text-sm"><span class="text-text">#{block}</span> <span style={`color:${color}`}>· {rarity}</span></span>
+</a>

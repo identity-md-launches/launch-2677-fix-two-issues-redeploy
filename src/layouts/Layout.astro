@@ -18,14 +18,19 @@ const { title, description, current } = Astro.props;
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title || 'SqueekBlockNFT'}</title>
-  <meta name="description" content={description || 'Mint block data cards on SqueekChain. Each NFT records round, work, and rarity — fully on-chain SVG art. Sepolia testnet.'} />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <meta name="description" content={description || 'Community-made block data cards for SqueekChain on Sepolia testnet. Not affiliated with SqueekChain.'} />
+  <meta property="og:title" content={title || 'SqueekBlockNFT'} />
+  <meta property="og:description" content={description || 'Community-made SVG block data cards on Sepolia. Not affiliated with SqueekChain.'} />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./og-image.png" />
+  <meta property="og:image:alt" content="SqueekBlockNFT community collection with the original SVG block data card design" />
+  <meta name="theme-color" content="#0a0a14" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
 </head>
 <body class="min-h-screen flex flex-col">
+  <a href="#main" class="skip-link">Skip to content</a>
   <Nav current={current || Astro.url.pathname} />
-  <main class="flex-1">
+  <main id="main" class="flex-1" tabindex="-1">
     <slot />
   </main>
   <Footer />

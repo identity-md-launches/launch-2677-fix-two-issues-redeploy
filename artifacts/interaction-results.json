@@ -1,0 +1,71 @@
+{
+  "results": [
+    {
+      "name": "All four pages, footers, metadata, assets and 320/390/768/1440 reflow",
+      "passed": true
+    },
+    {
+      "name": "First 390px screen exposes product, mint action and original SVG card",
+      "passed": true
+    },
+    {
+      "name": "Navigation and sample links stay inside the IPFS subpath",
+      "passed": true
+    },
+    {
+      "name": "No-wallet picker, Escape, focus restoration and disabled mint",
+      "passed": true
+    },
+    {
+      "name": "Preview validation, unminted state and safe on-chain card rendering",
+      "passed": true
+    },
+    {
+      "name": "Gallery ranges include block 51, full-size dialog and deep link",
+      "passed": true
+    },
+    {
+      "name": "Keyboard skip link and enlarged-text/RTL reflow",
+      "passed": true
+    },
+    {
+      "name": "Blocked external network: all pages/scripts load, errors recover with retry",
+      "passed": true
+    },
+    {
+      "name": "Gallery empty state is distinct from RPC failure",
+      "passed": true
+    },
+    {
+      "name": "EIP-6963 wallet rejection returns picker to idle",
+      "passed": true
+    },
+    {
+      "name": "Wrong-network rejection keeps mint disabled; retry switches Sepolia",
+      "passed": true
+    },
+    {
+      "name": "Mint checks duplicate and unmined blocks before asking for a transaction",
+      "passed": true
+    },
+    {
+      "name": "Mint wallet cancellation is recoverable and never reports success",
+      "passed": true
+    },
+    {
+      "name": "Account/network changes and disconnect immediately disable mint",
+      "passed": true
+    },
+    {
+      "name": "Mobile no-wallet picker links to this gateway URL inside wallet browsers",
+      "passed": true
+    },
+    {
+      "name": "Without JavaScript the four sample SVGs, pages, primary links and disclaimer remain usable",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "WebKit not run: browserType.launch:  ╔══════════════════════════════════════════════════════╗ ║ Host system is missing dependencies to run browsers. ║ ║ Missing libraries:                                   ║ ║     libgtk-4.so.1                                    ║"
+  ]
+}

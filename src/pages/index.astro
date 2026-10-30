@@ -1,80 +1,85 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import BlockCard from '../components/BlockCard.astro';
 ---
 
 <Layout 
-  title="SqueekBlockNFT — On-Chain Block Data Cards" 
-  description="Collect SqueekChain history. Fully on-chain SVG block data cards — round, work, rarity. Mint on Sepolia testnet."
+  title="SqueekBlockNFT · Community block data cards"
+  description="Community-made SVG block data cards for SqueekChain on Sepolia testnet. Not affiliated with SqueekChain."
   current="/"
 >
-<div class="max-w-3xl mx-auto px-4 py-16">
+<div class="max-w-3xl mx-auto px-4 pt-8 pb-12">
   
   <!-- Hero -->
-  <div class="text-center mb-12">
-    <h1 class="text-amber text-2xl font-bold mb-3">🐹 SqueekBlockNFT</h1>
-    <p class="text-xs mb-3" style="color:#f5a623;background:#1a1a0a;padding:6px 12px;border-radius:6px;border:1px solid #f5a62333;display:inline-block">🐹 v1 — block data cards. NFT art will be upgraded in future versions.</p>
-    <p class="text-muted text-sm max-w-lg mx-auto mb-2">
-      Collect SqueekChain history. Each block is a fully on-chain data card — recording round, work, and rarity from the hamster's journey.
-    </p>
-    <p class="text-xs text-muted mb-6">Sepolia testnet · 10,000 supply · No roadmap, just vibes</p>
+  <div class="text-center mb-6">
+    <h1 class="text-amber text-2xl font-bold mb-3">SqueekBlockNFT</h1>
+    <p class="text-muted text-sm max-w-lg mx-auto mb-2">Community-made SVG block data cards for SqueekChain.</p>
+    <p class="text-sm text-muted mb-4">Sepolia testnet · 10,000 supply · Gas only</p>
     <div class="flex justify-center gap-3">
-      <a href="/mint" class="term-btn" style="border-color:var(--color-amber);color:var(--color-amber);text-decoration:none;padding:8px 24px;font-size:14px">
+      <a href="./mint.html" class="term-btn primary">
         Mint a Block
       </a>
-      <a href="/gallery" class="term-btn" style="border-color:var(--color-green);color:var(--color-green);text-decoration:none;padding:8px 24px;font-size:14px">
+      <a href="./gallery.html" class="term-btn">
         View Gallery
       </a>
     </div>
   </div>
 
-  <!-- Chain Stats -->
-  <div class="term-box p-5 mb-8">
-    <h2 class="text-xs text-green mb-3">> Chain Stats</h2>
-    <div id="chainStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-      <div class="text-center p-3 term-box"><div class="text-muted mb-1">Block Height</div><div class="text-text font-bold text-lg" id="statHeight">--</div></div>
-      <div class="text-center p-3 term-box"><div class="text-muted mb-1">Total Minted</div><div class="text-green font-bold text-lg" id="statMinted">--</div></div>
-      <div class="text-center p-3 term-box"><div class="text-muted mb-1">Max Supply</div><div class="text-text font-bold text-lg">10,000</div></div>
-      <div class="text-center p-3 term-box"><div class="text-muted mb-1">Network</div><div class="text-amber font-bold text-lg">Sepolia</div></div>
-    </div>
-  </div>
-
-  <!-- Sample Cards -->
-  <div class="mb-8">
-    <h2 class="text-xs text-green mb-3">> Sample Cards</h2>
+  <!-- The original SVG card design is rendered at build time. -->
+  <section class="mb-8" aria-labelledby="sampleHeading">
+    <h2 id="sampleHeading" class="section-title">Sample cards</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="sampleCards">
+      <BlockCard block={1} round={1} work={11} />
+      <BlockCard block={100} round={3} work={1086} />
+      <BlockCard block={1000} round={141} work={10941} />
+      <BlockCard block={6969} round={894} work={79134} />
     </div>
-  </div>
+    <p class="text-sm text-muted mt-2">Examples of the card design, not a list of available blocks.</p>
+  </section>
+
+  <section class="mb-8" aria-labelledby="statsHeading">
+    <h2 id="statsHeading" class="section-title">Chain stats</h2>
+    <div id="chainStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm term-box p-4">
+      <div><div class="text-muted mb-1">Block height</div><div class="text-text font-bold text-lg" id="statHeight">Loading…</div></div>
+      <div><div class="text-muted mb-1">Total minted</div><div class="text-green font-bold text-lg" id="statMinted">Loading…</div></div>
+      <div><div class="text-muted mb-1">Max supply</div><div class="text-text font-bold text-lg">10,000</div></div>
+      <div><div class="text-muted mb-1">Network</div><div class="text-amber font-bold text-lg">Sepolia</div></div>
+    </div>
+    <p id="statsStatus" role="status" class="text-sm text-muted mt-2"></p>
+    <button id="retryStats" class="term-btn mt-2" hidden>Retry stats</button>
+    <noscript><p class="text-sm text-muted mt-2">Enable JavaScript for live Sepolia stats and wallet interactions.</p></noscript>
+  </section>
 
   <!-- How it works -->
   <div class="mb-8">
-    <h2 class="text-xs text-green mb-3">> How It Works</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+    <h2 class="section-title">How it works</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
       <div class="term-box p-4">
         <div class="text-amber font-bold mb-2">01. Connect</div>
-        <p class="text-muted">Connect your wallet to Sepolia testnet. The site auto-switches to the right network.</p>
+        <p class="text-muted">Connect a browser wallet, then switch to Sepolia when prompted.</p>
       </div>
       <div class="term-box p-4">
         <div class="text-amber font-bold mb-2">02. Pick a Block</div>
-        <p class="text-muted">Pick a block that the hamster has already mined. Max supply is 10,000 blocks — check the current chain height to see what's available right now.</p>
+        <p class="text-muted">Choose a mined block from #1 to #10,000. Check the chain height for availability.</p>
       </div>
       <div class="term-box p-4">
         <div class="text-amber font-bold mb-2">03. Mint & View</div>
-        <p class="text-muted">Mint your block data card. View it anytime in the gallery — each card shows round, work, and rarity.</p>
+        <p class="text-muted">Mint your block data card, then view it in the gallery. Each card shows round, work, and rarity.</p>
       </div>
     </div>
   </div>
 
   <!-- Why Collect -->
   <div class="mb-8">
-    <h2 class="text-xs text-green mb-3">> Why Collect?</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+    <h2 class="section-title">Why collect?</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
       <div class="term-box p-4">
         <div class="text-amber font-bold mb-1">Early Blocks = Legendary</div>
-        <p class="text-muted">Blocks #1-#10 are Legendary. #11-#100 are Epic. The earlier you mint, the rarer the card — these are the genesis blocks of SqueekChain history.</p>
+        <p class="text-muted">Blocks #1–#10 are Legendary. #11–#100 are Epic. Rarity comes from the block number, not when you mint.</p>
       </div>
       <div class="term-box p-4">
         <div class="text-amber font-bold mb-1">Fully On-Chain</div>
-        <p class="text-muted">No IPFS. No external hosting. The entire SVG art is generated and stored on Ethereum. Your NFT lives as long as Sepolia exists.</p>
+        <p class="text-muted">The card’s SVG art is generated on-chain. The website is a separate static export prepared for IPFS.</p>
       </div>
       <div class="term-box p-4">
         <div class="text-amber font-bold mb-1">Milestone Blocks</div>
@@ -88,90 +93,15 @@ import Layout from '../layouts/Layout.astro';
   </div>
 
   <!-- Contract info -->
-  <div class="term-box p-5 text-xs">
+  <div class="term-box p-5 text-sm">
     <div class="flex flex-col md:flex-row md:justify-between gap-2">
-      <span class="text-muted">Contract: <a href="https://sepolia.etherscan.io/address/0x531497ddc70d634342020b1111C8b1A92873e669" class="text-green hover:underline" target="_blank">0x531497ddc70d634342020b1111C8b1A92873e669</a></span>
-      <span class="text-muted"><span class="text-green">✓</span> Verified on Sepolia testnet</span>
+      <span class="text-muted">Contract: <a href="https://sepolia.etherscan.io/address/0x531497ddc70d634342020b1111C8b1A92873e669" class="text-green underline break-address" target="_blank" rel="noopener noreferrer">0x531497ddc70d634342020b1111C8b1A92873e669</a></span>
+      <span class="text-muted">Sepolia testnet deployment</span>
     </div>
-    <p class="text-muted mt-2">This is a community project. We are not affiliated with SqueekChain.</p>
   </div>
 </div>
 </Layout>
 
 <script>
-  import { ethers } from 'https://esm.sh/ethers@6.13.5';
-  const CORE = '0x74665dAecA35A2303e767E76a2FF1FB6F93e119f';
-  const CONTRACT_ABI = ['function totalMinted() view returns (uint256)'];
-  const CORE_ABI = ['function state() view returns (uint64,uint64,uint96,uint64,uint96,uint32,uint256,bool)'];
-
-  async function loadStats() {
-    try {
-      const p = new ethers.JsonRpcProvider('https://ethereum-sepolia-rpc.publicnode.com');
-      const core = new ethers.Contract(CORE, CORE_ABI, p);
-      const nft = new ethers.Contract('0x531497ddc70d634342020b1111C8b1A92873e669', CONTRACT_ABI, p);
-      const [state, minted] = await Promise.all([core.state(), nft.totalMinted()]);
-      document.getElementById('statHeight').textContent = Number(state[3]).toLocaleString();
-      document.getElementById('statMinted').textContent = Number(minted).toLocaleString();
-    } catch {}
-  }
-  loadStats();
-  renderSamples();
-
-  function rarity(b) {
-    if (b <= 10) return "Legendary";
-    if (b <= 100) return "Epic";
-    if (b <= 1000) return "Rare";
-    if (b % 1000 === 0) return "Milestone";
-    if (b % 100 === 0) return "Notable";
-    return "Common";
-  }
-
-  function rarityColor(rar) {
-    if (rar === "Legendary") return "#f5a623";
-    if (rar === "Epic") return "#a855f7";
-    if (rar === "Rare") return "#4a90d9";
-    if (rar === "Milestone" || rar === "Notable") return "#16c79a";
-    return "#888";
-  }
-
-  function row(label, y, value, color) {
-    return `<text x="80" y="${y}" fill="#888" font-size="13" font-family="monospace">${label}</text><text x="320" y="${y}" text-anchor="end" fill="${color}" font-size="15" font-family="monospace" font-weight="bold">${value}</text>`;
-  }
-
-  function renderSamples() {
-    const samples = [
-      { b: 1, r: 1, w: 11 },
-      { b: 100, r: 3, w: 1086 },
-      { b: 1000, r: 141, w: 10941 },
-      { b: 6969, r: 894, w: 79134 },
-    ];
-    const grid = document.getElementById('sampleCards');
-    grid.innerHTML = samples.map(s => {
-      const rar = rarity(s.b);
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" shape-rendering="crispEdges">
-<rect width="400" height="300" fill="#0a0a14"/>
-<text x="200" y="38" text-anchor="middle" fill="#f5a623" font-size="16" font-family="monospace" font-weight="bold">🐹 SQUEKKCHAIN</text>
-<line x1="40" y1="48" x2="360" y2="48" stroke="#f5a623" stroke-width="1" opacity="0.3"/>
-<text x="200" y="105" text-anchor="middle" fill="#ffffff" font-size="64" font-family="monospace" font-weight="bold">#${s.b}</text>
-<text x="200" y="135" text-anchor="middle" fill="#888" font-size="13" font-family="monospace">Block ${s.b}</text>
-<rect x="145" y="150" width="110" height="26" rx="13" fill="#16c79a" opacity="0.15"/>
-<text x="200" y="168" text-anchor="middle" fill="#16c79a" font-size="13" font-family="monospace" font-weight="bold">✓ SETTLED</text>
-<rect x="60" y="185" width="280" height="95" rx="10" fill="#111122" stroke="#222244" stroke-width="1"/>
-${row("Round", 210, String(s.r), "#c0c0f0")}
-${row("Work", 238, String(s.w), "#c0c0f0")}
-${row("Rarity", 266, rar, "#e94560")}
-</svg>`;
-      const svgBase64 = btoa(unescape(encodeURIComponent(svg)));
-      return `<div class="term-box p-2 text-center hover:opacity-80" style="cursor:pointer" onclick="location.href='/mint'">
-        <img src="data:image/svg+xml;base64,${svgBase64}" style="width:100%;aspect-ratio:4/3;object-fit:contain;border-radius:4px" />
-        <div class="text-xs mt-1"><span class="text-text">#${s.b}</span> <span style="color:${rarityColor(rar)}">· ${rar}</span></div>
-      </div>`;
-    }).join('');
-  }
+  import '../scripts/home';
 </script>
-
-<style>
-  .term-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
-  .term-btn { background: transparent; border: 1px solid; border-radius: 6px; font-family: var(--font-mono); cursor: pointer; display: inline-block; }
-  .term-btn:hover { opacity: 0.8; }
-</style>

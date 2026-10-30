@@ -1,154 +1,52 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 ---
-
-<Layout title="Mint — SqueekBlockNFT" description="Mint SqueekChain block data cards on Sepolia testnet. Fully on-chain SVG art." current="/mint">
-<div class="max-w-2xl mx-auto px-4 py-12">
-  <h1 class="text-amber text-lg font-bold mb-1">> Mint a Block</h1>
-  <p class="text-muted text-xs mb-2">Connect your wallet, pick a block, mint your NFT.</p>
-  <p class="text-xs mb-6" style="color:#f5a623;background:#1a1a0a;padding:6px 12px;border-radius:6px;border:1px solid #f5a62333;display:inline-block">🚰 This is Sepolia testnet. Need ETH? Get free testnet ETH from <a href="https://sepolia-faucet.pk910.de/" class="text-green hover:underline" target="_blank">sepolia-faucet.pk910.de</a></p>
-
-  <div class="term-box p-5 mb-6">
-    <!-- Wallet -->
-    <div class="mb-4">
-      <button id="connectBtn" class="term-btn" style="border-color:var(--color-amber);color:var(--color-amber)">
-        Connect Wallet
-      </button>
-      <span id="walletAddr" class="text-xs text-green ml-3 hidden"></span>
-      <span id="chainWarning" class="text-xs text-red ml-3 hidden">⚠ Wrong network — switch to Sepolia</span>
-    </div>
-
-    <!-- Block picker + status -->
-    <div class="mb-4 hidden" id="mintSection">
-      <div class="text-xs text-green mb-2">> On-Chain Data</div>
-      <div class="grid grid-cols-2 gap-3 text-xs mb-4">
-        <div class="term-box p-3"><span class="text-muted">Block Height</span> <span id="chainHeight" class="text-text float-right">--</span></div>
-        <div class="term-box p-3"><span class="text-muted">Total Minted</span> <span id="chainMinted" class="text-green float-right">--</span></div>
+<Layout title="Mint · SqueekBlockNFT" description="Mint community-made SqueekChain block data cards on Sepolia testnet. Not affiliated with SqueekChain." current="/mint">
+  <div class="max-w-2xl mx-auto px-4 py-8">
+    <h1 class="text-amber text-2xl font-bold mb-2">Mint a block</h1>
+    <p class="text-muted text-sm mb-3">Collect an on-chain SVG card. Minting is free; you pay Sepolia gas.</p>
+    <p class="text-sm text-muted mb-6">Testnet only. Need gas? <a href="https://sepolia-faucet.pk910.de/" class="text-green underline" target="_blank" rel="noopener noreferrer">Get Sepolia ETH</a>.</p>
+    <section class="term-box p-5 mb-6" aria-label="Mint a block card">
+      <div class="flex flex-wrap items-center gap-3 mb-3">
+        <button id="connectBtn" class="term-btn primary" aria-haspopup="dialog">Connect wallet</button>
+        <button id="disconnectBtn" class="term-btn" hidden>Disconnect</button>
+        <span id="walletAddr" class="text-sm text-green" hidden></span>
       </div>
-
-      <label class="text-xs text-muted block mb-2">Block number (1-10,000):</label>
-      <div class="flex gap-2 mb-3">
-        <input type="number" id="blockNum" min="1" max="10000" value="1" class="term-input flex-1" />
-        <button id="mintBtn" class="term-btn" style="border-color:var(--color-green);color:var(--color-green)">Mint</button>
+      <p id="walletStatus" role="status" class="status text-sm text-muted mb-4">Connect a browser wallet to mint. Preview cards without connecting.</p>
+      <div class="grid grid-cols-2 gap-3 text-sm mb-4">
+        <div><span class="text-muted block">Block height</span><span id="chainHeight" class="text-text">Loading…</span></div>
+        <div><span class="text-muted block">Total minted</span><span id="chainMinted" class="text-green">Loading…</span></div>
       </div>
-      <div id="mintStatus" class="text-xs text-muted hidden"></div>
-    </div>
-
-    <!-- Token display -->
-    <div class="hidden" id="tokenSection">
-      <div class="text-xs text-green mb-2">> Token Preview</div>
-      <div id="tokenDisplay" class="flex justify-center"></div>
-    </div>
+      <p id="chainStatus" role="status" class="status text-sm text-muted mb-2"></p>
+      <button id="retryChain" class="term-btn mb-4" hidden>Retry chain data</button>
+      <form id="mintForm" novalidate>
+        <label for="blockNum" class="text-sm block mb-2">Block number (1–10,000)</label>
+        <input type="number" id="blockNum" name="block" inputmode="numeric" min="1" max="10000" step="1" value="1" required class="term-input w-full mb-3" aria-describedby="blockHelp mintStatus" />
+        <p id="blockHelp" class="text-sm text-muted mb-3">Choose a mined block. Each block can be minted once. Preview opens its art if it has already been minted.</p>
+        <div class="flex flex-wrap gap-3">
+          <button id="mintBtn" type="submit" class="term-btn" disabled>Mint block</button>
+          <button id="previewBtn" type="button" class="term-btn">Preview card</button>
+        </div>
+        <p id="mintStatus" role="status" class="status text-sm text-muted mt-3"></p>
+        <a id="transactionLink" class="text-sm text-green underline break-address" target="_blank" rel="noopener noreferrer" hidden>View transaction on Etherscan</a>
+      </form>
+      <noscript><p class="text-sm text-muted mt-4">Enable JavaScript to connect a wallet, load cards, and mint.</p></noscript>
+    </section>
+    <section id="tokenSection" class="mb-6" hidden aria-labelledby="tokenHeading">
+      <h2 id="tokenHeading" class="section-title">Token preview</h2>
+      <div id="tokenDisplay"></div>
+      <p id="tokenCaption" class="text-sm text-muted mt-2 text-center"></p>
+    </section>
   </div>
-
-  <!-- Recently minted -->
-  <div class="hidden" id="recentSection">
-    <h2 class="text-xs text-green mb-3">> Recently Minted</h2>
-    <div id="recentList" class="flex flex-wrap gap-2 text-xs"></div>
-  </div>
-</div>
+  <dialog id="walletDialog" aria-labelledby="walletHeading">
+    <div class="flex justify-between items-center gap-3 mb-3">
+      <h2 id="walletHeading" class="text-lg font-bold">Connect a wallet</h2>
+      <button id="closeWallet" class="term-btn" aria-label="Close wallet picker">×</button>
+    </div>
+    <div id="walletList"></div>
+    <p id="walletDialogStatus" class="status text-sm text-muted mt-3" role="status"></p>
+  </dialog>
 </Layout>
-
 <script>
-  import { ethers } from 'https://esm.sh/ethers@6.13.5';
-
-  const CONTRACT = '0x531497ddc70d634342020b1111C8b1A92873e669';
-  const CORE = '0x74665dAecA35A2303e767E76a2FF1FB6F93e119f';
-  const NFT_ABI = ['function mint(uint256 b) external','function tokenURI(uint256 b) view returns (string)','function blockMinted(uint256) view returns (bool)','function totalMinted() view returns (uint256)'];
-  const CORE_ABI = ['function state() view returns (uint64,uint64,uint96,uint64,uint96,uint32,uint256,bool)','function blockInfo(uint64) view returns (uint64,uint64)'];
-
-  let provider, signer, nft, core, account;
-
-  document.getElementById('connectBtn').addEventListener('click', async () => {
-    if (!window.ethereum) return alert('Install MetaMask');
-    try {
-      await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: '0xaa36a7' }] });
-    } catch (e) {
-      if (e.code === 4902) await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: '0xaa36a7', chainName: 'Sepolia Testnet', rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'], nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, blockExplorerUrls: ['https://sepolia.etherscan.io'] }] });
-    }
-    await window.ethereum.request({ method: 'eth_requestAccounts' });
-    provider = new ethers.BrowserProvider(window.ethereum);
-    signer = await provider.getSigner();
-    account = await signer.getAddress();
-    nft = new ethers.Contract(CONTRACT, NFT_ABI, signer);
-    core = new ethers.Contract(CORE, CORE_ABI, provider);
-
-    document.getElementById('connectBtn').classList.add('hidden');
-    const addr = document.getElementById('walletAddr');
-    addr.textContent = `${account.slice(0,6)}...${account.slice(-4)}`;
-    addr.classList.remove('hidden');
-    document.getElementById('mintSection').classList.remove('hidden');
-    document.getElementById('recentSection').classList.remove('hidden');
-    await refreshChain();
-  });
-
-  async function refreshChain() {
-    const state = await core.state();
-    const h = Number(state[3]); const minted = Number(await nft.totalMinted());
-    document.getElementById('chainHeight').textContent = h.toLocaleString();
-    document.getElementById('chainMinted').textContent = minted.toLocaleString();
-    document.getElementById('blockNum').max = h;
-    if (Number(document.getElementById('blockNum').value) > h) document.getElementById('blockNum').value = h;
-    await loadRecent(h);
-  }
-
-  document.getElementById('mintBtn').addEventListener('click', async () => {
-    const b = document.getElementById('blockNum').value;
-    const s = document.getElementById('mintStatus');
-    const state = await core.state();
-    const h = Number(state[3]);
-
-    // Check before sending tx
-    if (Number(b) > h) {
-      s.textContent = `⚠ Block #${b} hasn't been mined yet. Current height: ${h.toLocaleString()}`;
-      s.classList.remove('hidden'); return;
-    }
-    const alreadyMinted = await nft.blockMinted(b);
-    if (alreadyMinted) {
-      s.textContent = `⚠ Block #${b} was already minted by someone else.`;
-      s.classList.remove('hidden'); return;
-    }
-
-    s.textContent = 'Sending tx...'; s.classList.remove('hidden');
-    try {
-      const tx = await nft.mint(b);
-      s.textContent = `Confirming ${tx.hash.slice(0,10)}...`;
-      await tx.wait();
-      s.textContent = `✅ Block #${b} minted!`;
-      await showToken(b);
-      await refreshChain();
-    } catch (e) {
-      const msg = e.reason || e.message || 'Unknown error';
-      if (msg.includes('BlockNotYetMined') || msg.includes('0x03565efd')) s.textContent = `⚠ Block #${b} hasn't been mined yet.`;
-      else if (msg.includes('BlockAlreadyMinted') || msg.includes('0x08c379a0')) s.textContent = `⚠ Block #${b} was already minted.`;
-      else s.textContent = `❌ ${msg.slice(0,80)}`;
-    }
-  });
-
-  async function showToken(b) {
-    try {
-      const uri = await nft.tokenURI(b);
-      const json = JSON.parse(atob(uri.replace('data:application/json;base64,','')));
-      document.getElementById('tokenSection').classList.remove('hidden');
-      document.getElementById('tokenDisplay').innerHTML = `<img src="${json.image}" style="width:320px;height:320px;border-radius:8px" />`;
-    } catch {}
-  }
-
-  async function loadRecent(h) {
-    const el = document.getElementById('recentList');
-    const minted = [];
-    for (let i = Math.max(1, h - 30); i <= h && minted.length < 12; i++) {
-      try { if (await nft.blockMinted(i)) minted.push(i); } catch {}
-    }
-    el.innerHTML = minted.map(b => `<a href="#" class="term-btn text-green" style="text-decoration:none;font-size:11px;padding:4px 10px" onclick="document.getElementById('blockNum').value=${b};return false">#${b}</a>`).join(' ');
-    if (minted.length === 0) el.textContent = 'No blocks minted yet';
-  }
+  import '../../scripts/mint';
 </script>
-
-<style>
-  .term-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
-  .term-btn { background: transparent; border: 1px solid; padding: 6px 16px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; cursor: pointer; }
-  .term-btn:hover { opacity: 0.8; }
-  .term-input { background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text); padding: 6px 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; }
-  .float-right { float: right; }
-</style>

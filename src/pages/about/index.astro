@@ -2,13 +2,13 @@
 import Layout from '../../layouts/Layout.astro';
 ---
 
-<Layout title="About — SqueekBlockNFT" current="/about">
+<Layout title="About · SqueekBlockNFT" current="/about">
 <div class="max-w-2xl mx-auto px-4 py-12">
-  <h1 class="text-amber text-lg font-bold mb-1">> About</h1>
-  <p class="text-muted text-xs mb-3">SqueekBlockNFT is the official NFT collection for SqueekChain.</p>
-  <p class="text-xs mb-8" style="color:#f5a623;background:#1a1a0a;padding:8px 12px;border-radius:6px;border:1px solid #f5a62333">🐹 <strong>v1 note:</strong> This is the initial release with block data cards. NFT art will be improved in future versions — stay tuned.</p>
+  <h1 class="text-amber text-2xl font-bold mb-2">About</h1>
+  <p class="text-muted text-sm mb-6">SqueekBlockNFT is a community-made collection of SqueekChain block data cards. It is not affiliated with SqueekChain.</p>
 
-  <div class="space-y-6 text-xs">
+
+  <div class="space-y-6 text-sm">
     <div class="term-box p-5">
       <h2 class="text-green font-bold mb-2">What is SqueekChain?</h2>
       <p class="text-muted">SqueekChain is a hamster-powered proof-of-work toychain on Ethereum Sepolia testnet. A hamster named Squeektoshi runs on the WHEELY9000 wheel. Each magnet passage is one work unit, settled to Ethereum as Squeek blocks, issuing SQK tokens.</p>
@@ -22,34 +22,30 @@ import Layout from '../../layouts/Layout.astro';
     <div class="term-box p-5">
       <h2 class="text-green font-bold mb-2">Rarity Tiers</h2>
       <div class="space-y-2 text-muted">
-        <div><span class="text-amber font-bold">Legendary</span> — Blocks #1-#10</div>
-        <div><span class="text-text font-bold" style="color:#a855f7">Epic</span> — Blocks #11-#100</div>
-        <div><span class="text-text font-bold" style="color:#4a90d9">Rare</span> — Blocks #101-#1,000</div>
-        <div><span class="text-green font-bold">Milestone</span> — Every 1,000th block</div>
-        <div><span class="text-green font-bold">Notable</span> — Every 100th block</div>
-        <div><span class="text-muted">Common</span> — Everything else</div>
+        <div><span class="text-amber font-bold">Legendary</span> · Blocks #1-#10</div>
+        <div><span class="text-text font-bold" style="color:var(--color-epic)">Epic</span> · Blocks #11-#100</div>
+        <div><span class="text-text font-bold" style="color:var(--color-rare)">Rare</span> · Blocks #101-#1,000</div>
+        <div><span class="text-green font-bold">Milestone</span> · Every 1,000th block</div>
+        <div><span class="text-green font-bold">Notable</span> · Every 100th block</div>
+        <div><span class="text-muted">Common</span> · Everything else</div>
       </div>
     </div>
 
     <div class="term-box p-5">
       <h2 class="text-green font-bold mb-2">How to Mint</h2>
-      <ol class="text-muted space-y-1 pl-4 list-decimal">
-        <li>Connect your wallet — site auto-switches to Sepolia testnet</li>
-        <li>Get Sepolia ETH from a faucet (alchemy.com/faucets, sepoliafaucet.com)</li>
+      <ol class="text-muted space-y-1 ps-4 list-decimal">
+        <li>Connect your browser wallet, then switch to Sepolia when prompted</li>
+        <li>Get testnet ETH from a <a href="https://sepolia-faucet.pk910.de/" class="text-green underline">Sepolia faucet</a></li>
         <li>Pick any block #1-#10,000 that has been mined</li>
-        <li>Click Mint — your NFT appears instantly</li>
+        <li>Select Mint and confirm in your wallet. Your card appears after the transaction confirms</li>
       </ol>
     </div>
 
     <div class="term-box p-5">
       <h2 class="text-green font-bold mb-2">Contract</h2>
-      <p class="text-muted">Deployed on Sepolia testnet. All art is generated fully on-chain via SVG. No IPFS, no external dependencies.</p>
-      <p class="mt-2"><a href="https://sepolia.etherscan.io/address/0x531497ddc70d634342020b1111C8b1A92873e669" class="text-green hover:underline">0x531497ddc70d634342020b1111C8b1A92873e669</a></p>
+      <p class="text-muted">Deployed on Sepolia testnet. All art is generated fully on-chain via SVG. Card metadata and SVG art are stored on-chain. This community website is a separate static export for IPFS.</p>
+      <p class="mt-2"><a href="https://sepolia.etherscan.io/address/0x531497ddc70d634342020b1111C8b1A92873e669" class="text-green underline break-address">0x531497ddc70d634342020b1111C8b1A92873e669</a></p>
     </div>
   </div>
 </div>
 </Layout>
-
-<style>
-  .term-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 8px; }
-</style>

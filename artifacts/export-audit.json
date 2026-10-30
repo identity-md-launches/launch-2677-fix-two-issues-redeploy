@@ -1,0 +1,148 @@
+{
+  "scope": "Final static export and conservative added/modified-file byte audit; worker result, not independent certification",
+  "checks": {
+    "fourPages": true,
+    "sharedCommunityDisclaimer": true,
+    "noAffiliationClaimInExport": true,
+    "localScriptURLs": true,
+    "allReferencedAssetsPresent": true,
+    "relativeCSSFont": true,
+    "noCDNImports": true,
+    "fourOriginalSVGSampleCards": true,
+    "sourceAndLockfileIncluded": true,
+    "existingProtectedFilesUnchanged": true,
+    "noSubmodulesOrSymlinksAdded": true,
+    "noDependencyCacheOrArchiveAdditions": true,
+    "withinPathBudgets": true,
+    "within8MiB": true
+  },
+  "distFileCount": 15,
+  "distBytes": 397004,
+  "shareImage": {
+    "width": 1200,
+    "height": 630
+  },
+  "submissionCandidateFilesExcludingThisAudit": 54,
+  "submissionCandidateBytesExcludingThisAudit": 1314954,
+  "submissionBudgetBytes": 8388608,
+  "pathBudgetsExcludingThisAudit": {
+    "dist/**": {
+      "bytes": 397004,
+      "budget": 1048576
+    },
+    "src/**": {
+      "bytes": 85962,
+      "budget": 262144
+    },
+    "public/**": {
+      "bytes": 49193,
+      "budget": 131072
+    },
+    "web/package-lock.json": {
+      "bytes": 195296,
+      "budget": 262144
+    },
+    "web/package.json": {
+      "bytes": 555,
+      "budget": 2048
+    },
+    "web/*.mjs": {
+      "bytes": 27474,
+      "budget": 65536
+    },
+    "web/.gitignore": {
+      "bytes": 265,
+      "budget": 1024
+    },
+    ".gitignore": {
+      "bytes": 544,
+      "budget": 2048
+    },
+    "artifacts/**": {
+      "bytes": 540578,
+      "budget": 1572864
+    },
+    "README.md + DESIGN.md": {
+      "bytes": 18083,
+      "budget": 65536
+    }
+  },
+  "files": [
+    {
+      "path": "dist/_astro/Layout.g_B_GHCv.css",
+      "bytes": 13379,
+      "sha256": "b0c9692aa327477ccbb2fedc9538a1c85c81318dccbb5263d6ccb28c7ee3931e"
+    },
+    {
+      "path": "dist/_astro/chain.BfCbNuyt.js",
+      "bytes": 252562,
+      "sha256": "6a7d761c59529c0f44db931ef9c3bb4bd9dc701ca4fcabdea7da1ea5929efa81"
+    },
+    {
+      "path": "dist/_astro/index.astro_astro_type_script_index_0_lang.B9xj2pns.js",
+      "bytes": 710,
+      "sha256": "7f8747a5280b2d790bb93aced14cc4d86417331c7f384f4e449b275f8ec5b2eb"
+    },
+    {
+      "path": "dist/_astro/index.astro_astro_type_script_index_0_lang.BU6PNih6.js",
+      "bytes": 2950,
+      "sha256": "14d8b020d75f8306ce2e868291ad93fdc51cee1ad2ab809d5f6b8272b8913b50"
+    },
+    {
+      "path": "dist/_astro/index.astro_astro_type_script_index_0_lang.BvsH6cK-.js",
+      "bytes": 9871,
+      "sha256": "fe5d5bad124064c6a436cc53c38b63e9a90b005d59e64d523c6db7c86e1e07aa"
+    },
+    {
+      "path": "dist/_astro/jetbrains-mono-latin.B9CIFXIH.woff2",
+      "bytes": 40404,
+      "sha256": "18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e"
+    },
+    {
+      "path": "dist/about.html",
+      "bytes": 4688,
+      "sha256": "a6c2bf864909b43c784535be5cab894e0a2b10912fc5420b5b28f872ff55c4d8"
+    },
+    {
+      "path": "dist/favicon.svg",
+      "bytes": 388,
+      "sha256": "bf2603a02e54e368ceb7e7b698adf9df3d2dd1c0c4f0f329dac8d15a27cf2b3f"
+    },
+    {
+      "path": "dist/gallery.html",
+      "bytes": 4098,
+      "sha256": "69bc69cbfebd7adb1b3963f4d69fd302b4895510290205670579a722f2e20760"
+    },
+    {
+      "path": "dist/index.html",
+      "bytes": 13910,
+      "sha256": "b9200d83c518a799a9136e74c3b1a039b72d9b4334a5904498830e6d11a95992"
+    },
+    {
+      "path": "dist/licenses/ethers-MIT.txt",
+      "bytes": 1075,
+      "sha256": "44eea86637405118248327fbe9d9fa95d04c7a57221c7e8c155f736db9f1b612"
+    },
+    {
+      "path": "dist/licenses/ethers-dependencies.txt",
+      "bytes": 6347,
+      "sha256": "a0e3ffcf9218cc2dc4b0b618ac696133d1fa67732f060208a20c1fd6c3f8fa6a"
+    },
+    {
+      "path": "dist/licenses/jetbrains-mono-OFL.txt",
+      "bytes": 4524,
+      "sha256": "403581b69dac5cff4079205e01c6b467e56af449ecbd7247693ddb1baafa005b"
+    },
+    {
+      "path": "dist/mint.html",
+      "bytes": 5239,
+      "sha256": "bf001185712b1e9bd022144b5fca4059681eed32eaf463f234329c4faecaa659"
+    },
+    {
+      "path": "dist/og-image.png",
+      "bytes": 36859,
+      "sha256": "59a309e5563d745f4a310042e4f6b948befbb9ec6b94f9b685aa6e135ec0fa4c"
+    }
+  ],
+  "publication": "Complete dist/ payload; IPFS pinning is performed by the contributor platform after submission. No deployment CID claimed."
+}

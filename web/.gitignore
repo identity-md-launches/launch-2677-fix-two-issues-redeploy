@@ -1,0 +1,10 @@
+# Submission path budget for web/: package.json <= 2 KiB;
+# package-lock.json <= 256 KiB; all *.mjs combined <= 64 KiB;
+# this .gitignore <= 1 KiB. Dependencies/caches/archives: 0 committed bytes.
+!package-lock.json
+node_modules/
+.npm/
+.cache/
+.astro/
+.vite/
+*.tgz
