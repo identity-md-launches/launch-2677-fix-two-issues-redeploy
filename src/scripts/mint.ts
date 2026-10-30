@@ -25,6 +25,7 @@ let correctChain = false;
 let busy = false;
 let browser: BrowserProvider | undefined;
 let previewRequest = 0;
+let loadingPreview = 0;
 const requested = Number(new URLSearchParams(location.search).get('block'));
 if (Number.isSafeInteger(requested) && requested >= 1 && requested <= MAX_SUPPLY) input.value = String(requested);
 
@@ -166,22 +167,29 @@ dialog.addEventListener('click', event => {
 });
 dialog.addEventListener('close', () => { if (!connect.hidden) connect.focus(); else disconnect.focus(); });
 
-async function showToken(block: number) {
-  const request = ++previewRequest;
+// Shows the card only if `request` is still the latest preview; returns whether it did.
+async function showToken(block: number, request: number) {
   const card = await readCard(reader.nft, block);
-  if (request !== previewRequest) return;
+  if (request !== previewRequest) return false;
   element('tokenDisplay').replaceChildren(cardImage(card, block));
   element('tokenCaption').textContent = `Block #${block} · ${card.rarity} · Sepolia`;
   element('tokenSection').hidden = false;
+  return true;
 }
 preview.addEventListener('click', async () => {
   const block = validateBlock(); if (!block) return;
+  const request = ++previewRequest; loadingPreview = request;
   preview.disabled = true; element('tokenSection').hidden = true; report(`Loading block #${block}…`);
   try {
-    if (!await reader.nft.blockMinted(block)) { report(`Block #${block} has not been minted. Connect your wallet to check availability and mint.`); return; }
-    await showToken(block); report(`Showing the on-chain card for block #${block}.`, 'success');
-  } catch (e) { report(errorMessage(e), 'error'); }
-  finally { preview.disabled = busy; }
+    const minted = await reader.nft.blockMinted(block);
+    if (request !== previewRequest) return;
+    if (!minted) { report(`Block #${block} has not been minted. Connect your wallet to check availability and mint.`); return; }
+    if (await showToken(block, request)) report(`Showing the on-chain card for block #${block}.`, 'success');
+  } catch (e) { if (request === previewRequest) report(errorMessage(e), 'error'); }
+  finally {
+    if (loadingPreview === request) loadingPreview = 0;
+    if (request === previewRequest) preview.disabled = busy;
+  }
 });
 element<HTMLFormElement>('mintForm').addEventListener('submit', async event => {
   event.preventDefault(); if (busy) return;
@@ -207,7 +215,7 @@ element<HTMLFormElement>('mintForm').addEventListener('submit', async event => {
     const receipt = await tx.wait(1, 120_000);
     if (!receipt || receipt.status !== 1) throw new Error('Transaction not confirmed');
     confirmed = true; report(`Block #${block} minted. Your transaction is confirmed.`, 'success');
-    try { await showToken(block); }
+    try { await showToken(block, ++previewRequest); }
     catch { report(`Block #${block} minted and confirmed. Card preview is temporarily unavailable; try Preview card.`, 'success'); }
     await refreshChain();
   } catch (e) {
@@ -217,6 +225,11 @@ element<HTMLFormElement>('mintForm').addEventListener('submit', async event => {
     }
   } finally { busy = false; updateControls(); }
 });
-input.addEventListener('input', () => { input.removeAttribute('aria-invalid'); element('tokenSection').hidden = true; previewRequest++; });
+input.addEventListener('input', () => {
+  input.removeAttribute('aria-invalid'); element('tokenSection').hidden = true;
+  // Invalidate any pending preview, including its blockMinted() read, and allow a new one.
+  if (loadingPreview && loadingPreview === previewRequest) { report(''); loadingPreview = 0; }
+  previewRequest++; preview.disabled = busy;
+});
 window.addEventListener('pagehide', event => { if (!event.persisted) { reader.provider.destroy(); detach(); } });
 void refreshChain();

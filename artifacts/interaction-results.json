@@ -21,6 +21,15 @@
       "passed": true
     },
     {
+      "name": "Rarity guidance matches the sample cards: one tier per block",
+      "passed": true
+    },
+    {
+      "name": "Chromium: editing the block during a pending preview discards the old response",
+      "passed": false,
+      "error": "Chromium blockMinted: stale card hidden\n\nfalse !== true\n"
+    },
+    {
       "name": "Gallery ranges include block 51, full-size dialog and deep link",
       "passed": true
     },
@@ -63,9 +72,18 @@
     {
       "name": "Without JavaScript the four sample SVGs, pages, primary links and disclaimer remain usable",
       "passed": true
+    },
+    {
+      "name": "WebKit: mobile first screen, navigation and no-wallet interaction",
+      "passed": true
+    },
+    {
+      "name": "WebKit: editing the block during a pending preview discards the old response",
+      "passed": false,
+      "error": "WebKit blockMinted: stale card hidden\n\nfalse !== true\n"
     }
   ],
-  "limitations": [
-    "WebKit not run: browserType.launch:  ╔══════════════════════════════════════════════════════╗ ║ Host system is missing dependencies to run browsers. ║ ║ Missing libraries:                                   ║ ║     libgtk-4.so.1                                    ║"
-  ]
+  "limitations": [],
+  "environment": "Chromium and WebKit 27.2 (Playwright 1.64.1, headless). WebKit ran with host libraries extracted from Ubuntu 24.04 packages into /tmp and PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=1; RPC and wallet responses are intercepted test fixtures.",
+  "negativeControl": "With src/scripts/mint.ts reverted to the previous commit and rebuilt, both preview-race checks failed (\"blockMinted: stale card hidden\") in Chromium and WebKit; 18/20 passed. The fixed source was then restored and rebuilt: 20/20."
 }

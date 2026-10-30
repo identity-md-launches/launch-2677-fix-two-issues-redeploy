@@ -59,6 +59,45 @@ function rpcResponse(payload, state) {
   } else throw Error(`Unexpected RPC ${method}`);
   return { jsonrpc: '2.0', id: payload.id, result };
 }
+function isHeld(payload, hold) {
+  if (payload.method !== 'eth_call') return false;
+  try { const call = nft.parseTransaction({ data: payload.params[0].data }); return call?.name === hold.method && Number(call.args[0]) === hold.block; }
+  catch { return false; }
+}
+function makeHold(method, block) {
+  const hold = { method, block };
+  hold.seenPromise = new Promise(r => { hold.seen = r; });
+  hold.released = new Promise(r => { hold.release = r; });
+  return hold;
+}
+// Holds one RPC response for 2,000ms while the visitor changes the block, then releases it unchanged.
+async function previewRace(browser, engine) {
+  for (const method of ['blockMinted', 'tokenURI']) {
+    const state = {}; const harness = await makeContext(browser, state); const p = await harness.context.newPage();
+    try {
+      await p.goto(`${base}mint.html`); await hasText(p, '#chainHeight', '200');
+      await p.locator('#blockNum').fill('1');
+      const hold = makeHold(method, 1); state.hold = hold;
+      await p.locator('#previewBtn').click();
+      await hold.seenPromise; const seenAt = Date.now();
+      await p.locator('#blockNum').fill('2');
+      const reenabled = await p.locator('#previewBtn').isEnabled();
+      await p.waitForTimeout(Math.max(0, 2000 - (Date.now() - seenAt)));
+      const delay = Date.now() - seenAt; hold.release();
+      await p.waitForTimeout(1000);
+      assert.equal(await p.locator('#blockNum').inputValue(), '2');
+      assert.equal(await p.locator('#tokenSection').isHidden(), true, `${engine} ${method}: stale card hidden`);
+      assert.doesNotMatch(await p.locator('#mintStatus').innerText(), /#1\b/, `${engine} ${method}: no stale status`);
+      assert.ok(reenabled, `${engine} ${method}: preview re-enabled while the old read was pending`);
+      assert.ok(delay >= 2000, `measured delay ${delay}ms`);
+      await p.locator('#previewBtn').click(); await hasText(p, '#mintStatus', 'Block #2 has not been minted');
+      await p.locator('#blockNum').fill('51'); await p.locator('#previewBtn').click();
+      await hasText(p, '#mintStatus', 'Showing the on-chain card for block #51.');
+      assert.equal(await p.locator('#tokenCaption').innerText(), 'Block #51 · Legendary · Sepolia');
+      assert.deepEqual(harness.errors, []);
+    } finally { await harness.context.close(); }
+  }
+}
 async function makeContext(browser, state = {}) {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
   const requests = [], failures = [], errors = [];
@@ -69,6 +108,9 @@ async function makeContext(browser, state = {}) {
     if (url.hostname === 'ethereum-sepolia-rpc.publicnode.com') {
       if (state.offline) return route.abort();
       const payload = request.postDataJSON();
+      if (state.hold && (Array.isArray(payload) ? payload : [payload]).some(p => isHeld(p, state.hold))) {
+        const hold = state.hold; state.hold = undefined; hold.seen(); await hold.released;
+      }
       const body = Array.isArray(payload) ? payload.map(p => rpcResponse(p, state)) : rpcResponse(payload, state);
       return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
     }
@@ -195,6 +237,19 @@ try {
     await hasText(page, '#mintStatus', 'Showing the on-chain card');
     assert.equal(await page.locator('#tokenSection img').getAttribute('src'), fixtureImage);
   });
+  await test('Rarity guidance matches the sample cards: one tier per block', async () => {
+    await page.goto(base);
+    const captions = await page.locator('#sampleCards a > span').allInnerTexts();
+    assert.ok(captions.includes('#100 · Epic') && captions.includes('#1000 · Rare'), captions.join(', '));
+    assert.match(await page.locator('main').innerText(), /After block #1,000, every 1,000th block is Milestone; other multiples of 100 are Notable\. Earlier blocks use the Legendary, Epic, or Rare tiers\./);
+    assert.doesNotMatch(await page.locator('main').innerText(), /Every 100th is Notable/);
+    await page.goto(`${base}about.html`);
+    const about = await page.locator('main').innerText();
+    assert.match(about, /Milestone · Multiples of 1,000 after #1,000/);
+    assert.match(about, /Notable · Multiples of 100 after #1,000, excluding Milestones/);
+    assert.doesNotMatch(about, /Every (1,000th|100th) block/);
+  });
+  await test('Chromium: editing the block during a pending preview discards the old response', () => previewRace(browser, 'Chromium'));
   await test('Gallery ranges include block 51, full-size dialog and deep link', async () => {
     await page.goto(`${base}gallery.html`); await hasText(page, '#galleryStatus', '1 minted card shown');
     await page.locator('#nextRange').click(); await hasText(page, '#galleryStatus', 'Blocks 51–100');
@@ -321,6 +376,7 @@ try {
       await sp.locator('a.primary').click(); await sp.locator('#connectBtn').click(); assert.ok(await sp.locator('#walletDialog').isVisible());
       await sp.keyboard.press('Escape'); assert.equal(await sp.locator('#walletDialog').isVisible(), false);
     });
+    await test('WebKit: editing the block during a pending preview discards the old response', () => previewRace(safari, 'WebKit'));
     await safari.close();
   } catch (e) { limitations.push(`WebKit not run: ${e.message.split('\n').filter(Boolean).slice(0, 5).join(' ')}`); console.log('LIMITATION WebKit unavailable (missing host libraries).'); }
 } finally {
